@@ -59,8 +59,8 @@ const Footer = () => {
 
         <div className="border-t border-white/10 mt-8 pt-6 text-center">
           <p className="text-gray-300 text-sm flex items-center justify-center gap-2">
-            Fait avec <Heart className="w-4 h-4 text-red-500 animate-pulse" /> par 
-            <span className="gradient-text font-semibold">DR NOUROU - Cours IA</span>
+            Fait par 
+            <span className="gradient-text font-semibold">Amadou Dièye SARR</span>
           </p>
           <p className="text-gray-400 text-xs mt-2">
             © 2025 Trash Detector AI. Tous droits réservés.

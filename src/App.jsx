@@ -7,6 +7,7 @@ import APIStatus from './components/APIStatus';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import StatsCard from './components/StatsCard';
+import ModelDownload from './components/ModelDownload';
 import trashDetectionAPI from './services/api';
 
 function App() {
@@ -136,6 +137,11 @@ function App() {
         {/* API Status */}
         <div className="mb-8">
           <APIStatus />
+        </div>
+
+        {/* Model Download */}
+        <div className="mb-8">
+          <ModelDownload />
         </div>
 
         {/* Tabs */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, Trash2, Package } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Trash2, Package, SearchX } from 'lucide-react';
 
 const ResultDisplay = ({ result, type = 'image' }) => {
   console.log('ResultDisplay - result:', result);
@@ -12,7 +12,14 @@ const ResultDisplay = ({ result, type = 'image' }) => {
 
   const getTrashStatus = (detections) => {
     if (!detections || detections.length === 0) {
-      return { status: 'empty', label: 'Poubelle Vide', icon: Trash2, color: 'text-green-600', bgColor: 'bg-green-100' };
+      return { 
+        status: 'empty', 
+        label: 'Aucune Poubelle Détectée', 
+        icon: SearchX, 
+        color: 'text-gray-400', 
+        bgColor: 'bg-gray-500/20',
+        message: 'Aucune poubelle n\'a été trouvée dans cette image. Essayez avec une autre image contenant des poubelles.'
+      };
     }
     
     // Vous pouvez affiner cette logique selon vos classes
@@ -22,10 +29,24 @@ const ResultDisplay = ({ result, type = 'image' }) => {
     );
     
     if (hasFullTrash) {
-      return { status: 'full', label: 'Poubelle Pleine', icon: Package, color: 'text-red-600', bgColor: 'bg-red-100' };
+      return { 
+        status: 'full', 
+        label: 'Poubelle Pleine', 
+        icon: Package, 
+        color: 'text-red-600', 
+        bgColor: 'bg-red-100',
+        message: 'Une ou plusieurs poubelles pleines ont été détectées.'
+      };
     }
     
-    return { status: 'detected', label: 'Poubelle Détectée', icon: AlertCircle, color: 'text-orange-600', bgColor: 'bg-orange-100' };
+    return { 
+      status: 'detected', 
+      label: 'Poubelle Détectée', 
+      icon: Trash2, 
+      color: 'text-green-600', 
+      bgColor: 'bg-green-100',
+      message: 'Des poubelles ont été détectées dans l\'image.'
+    };
   };
 
   const trashStatus = getTrashStatus(result.detections);
@@ -36,43 +57,74 @@ const ResultDisplay = ({ result, type = 'image' }) => {
   return (
     <div className="space-y-6 animate-slide-up">
       {/* Statut principal */}
-      <div className={`glass-effect p-6 border-l-4 ${trashStatus.bgColor.replace('bg-', 'border-').replace('-100', '-500')}`}>
+      <div className={`glass-effect p-6 border-l-4 ${trashStatus.bgColor.replace('bg-', 'border-').replace('-100', '-500').replace('/20', '')}`}>
         <div className="flex items-center gap-4">
           <div className={`${trashStatus.bgColor} p-4 rounded-xl animate-float`}>
             <StatusIcon className={`w-12 h-12 ${trashStatus.color}`} />
           </div>
-          <div>
-            <h3 className={`text-2xl font-bold text-white`}>
+          <div className="flex-1">
+            <h3 className={`text-2xl font-bold text-white mb-2`}>
               {trashStatus.label}
             </h3>
-            <p className="text-gray-300 mt-1">
+            <p className="text-gray-300 text-sm mb-1">
               {result.detections_count} détection(s) trouvée(s)
             </p>
+            {trashStatus.message && (
+              <p className="text-gray-400 text-sm italic">
+                {trashStatus.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Message spécial si aucune détection */}
+      {(!result.detections || result.detections.length === 0) && (
+        <div className="card bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="text-center py-8">
+            <SearchX className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+              Aucune Poubelle Trouvée
+            </h4>
+            <p className="text-gray-600 mb-4">
+              L'analyse n'a détecté aucune poubelle dans cette image.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+              <p className="text-sm text-blue-800 font-semibold mb-2">💡 Suggestions :</p>
+              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                <li>Assurez-vous que l'image contient des poubelles visibles</li>
+                <li>Vérifiez que l'image est claire et bien éclairée</li>
+                <li>Essayez avec une autre image</li>
+                <li>Le modèle a été entraîné pour détecter des types spécifiques de poubelles</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Image/Vidéo annotée */}
-      <div className="card">
-        <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-primary-600" />
-          Résultat de l'Analyse
-        </h4>
-        
-        {type === 'image' ? (
-          <img
-            src={result.image}
-            alt="Résultat de détection"
-            className="w-full h-auto rounded-xl shadow-2xl border-2 border-gray-200"
-          />
-        ) : (
-          <video
-            src={result.video}
-            controls
-            className="w-full h-auto rounded-xl shadow-2xl border-2 border-gray-200"
-          />
-        )}
-      </div>
+      {result.image || result.video ? (
+        <div className="card">
+          <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-primary-600" />
+            Résultat de l'Analyse
+          </h4>
+          
+          {type === 'image' ? (
+            <img
+              src={result.image}
+              alt="Résultat de détection"
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-gray-200"
+            />
+          ) : (
+            <video
+              src={result.video}
+              controls
+              className="w-full h-auto rounded-xl shadow-2xl border-2 border-gray-200"
+            />
+          )}
+        </div>
+      ) : null}
 
       {/* Détails des détections */}
       {result.detections && result.detections.length > 0 && (
